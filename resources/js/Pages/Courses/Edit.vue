@@ -2,7 +2,7 @@
 	<app-layout>
 		<template #header>
 			<h2 class="font-semibold text-xl text-gray-800 leading-tight">
-				Dashboard
+				Modification de {{ courseEdit.title }}
 			</h2>
 		</template>
 
@@ -27,7 +27,7 @@
 							id="title"
 							type="text"
 							placeholder="Title"
-							v-model="form.title"
+							v-model="courseEdit.title"
 						/>
 						<div
 							class="alert bg-red-400 text-white m-2 rounded pl-5"
@@ -52,7 +52,7 @@
 							id="description"
 							type="text"
 							placeholder="Description"
-							v-model="form.description"
+							v-model="courseEdit.description"
 						></textarea>
 						<div
 							class="alert bg-red-400 text-white m-2 rounded pl-5"
@@ -72,7 +72,7 @@
 						<h2 class="text-3xl">Episodes de la formation</h2>
 						<div
 							class="border border-gray-400 border-2 p-4 rounded m-2 mb-5 shadow-inner"
-							v-for="(epi, index) in form.episodes"
+							v-for="(epi, index) in courseEdit.episodes"
 							v-bind:key="index"
 						>
 							<div class="mb-4">
@@ -87,7 +87,7 @@
 									:id="'title' + index"
 									type="text"
 									placeholder="Title"
-									v-model="form.episodes[index].title"
+									v-model="courseEdit.episodes[index].title"
 								/>
 								<div
 									class="alert bg-red-400 text-white m-2 rounded pl-5"
@@ -117,7 +117,7 @@
 									:id="'description' + index"
 									type="text"
 									placeholder="Description"
-									v-model="form.episodes[index].description"
+									v-model="courseEdit.episodes[index].description"
 								/>
 								<div
 									class="alert bg-red-400 text-white m-2 rounded pl-5"
@@ -147,7 +147,7 @@
 									:id="'video_url' + index"
 									type="text"
 									placeholder="Video Url"
-									v-model="form.episodes[index].video_url"
+									v-model="courseEdit.episodes[index].video_url"
 								/>
 								<div
 									class="alert bg-red-400 text-white m-2 rounded pl-5"
@@ -170,14 +170,14 @@
 							<button
 								class="px-4 py-2 bg-green-600 rounded my-2 text-white block"
 								@click.prevent="add"
-								v-if="form.episodes.length < 15"
+								v-if="courseEdit.episodes.length < 15"
 							>
 								➕
 							</button>
 							<button
 								class="px-4 py-2 bg-red-600 rounded my-2 text-white block"
 								@click.prevent="remove"
-								v-if="form.episodes.length > 0"
+								v-if="courseEdit.episodes.length > 0"
 							>
 								🗑️
 							</button>
@@ -188,7 +188,7 @@
 						class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
 						type="submit"
 					>
-						Créer ma formation
+						Modifier ma formation
 					</button>
 				</form>
 			</div>
@@ -203,34 +203,23 @@
 		components: {
 			AppLayout,
 		},
+		props: ["course"],
 		data() {
-			return {
-				form: {
-					title: null,
-					description: null,
-					episodes: [
-						{
-							title: null,
-							description: null,
-							video_url: null,
-						},
-					],
-				},
-			};
+			return { courseEdit: this.course };
 		},
 		methods: {
 			submit() {
-				this.$inertia.post("/courses", this.form);
+				this.$inertia.patch(`/courses/${this.courseEdit.id}`, this.courseEdit);
 			},
 			add() {
-				this.form.episodes.push({
+				this.courseEdit.episodes.push({
 					title: null,
 					description: null,
 					video_url: null,
 				});
 			},
 			remove() {
-				this.form.episodes.pop();
+				this.courseEdit.episodes.pop();
 			},
 		},
 	};

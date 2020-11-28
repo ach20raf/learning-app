@@ -26,8 +26,7 @@
 						v-bind:key="ep.id"
 					>
 						<div>
-							Episode nº{{ index + 1 }} - {{ ep.title }} - ID : {{ ep.id }} -
-							Course ID : {{ ep.course_id }}
+							Episode nº{{ index + 1 }} - {{ ep.title }} -
 							<button
 								class="text-gray-500 focus:text-indigo-500 hover:text-blue-600 focus:outline-none"
 								@click="switchEp(ep.id)"

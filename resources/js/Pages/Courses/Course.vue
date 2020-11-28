@@ -17,11 +17,19 @@
 		</div>
 
 		<div class="text-sm text-gray-500">{{ courseItem.description }}</div>
-		<a
-			class="bg-indigo-500 text-white px-2 py-1 mt-3 text-sm rounded hover:bg-indigo-800 inline-block"
-			:href="'course/' + courseItem.id"
-			>Voir la formation</a
-		>
+		<div class="flex items-center justify-between">
+			<a
+				class="bg-indigo-500 text-white px-2 py-1 mt-3 text-sm rounded hover:bg-indigo-800 inline-block"
+				:href="'courses/' + courseItem.id"
+				>Voir la formation</a
+			>
+			<a
+				class="bg-gray-800 text-white px-2 py-1 mt-3 text-sm rounded hover:bg-gray-500 inline-block"
+				:href="'courses/edit/' + courseItem.id"
+				v-if="courseItem.update"
+				>Modifier la formation</a
+			>
+		</div>
 	</div>
 </template>
 <script>

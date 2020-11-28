@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
+
     return view('welcome');
 });
 
@@ -21,7 +22,7 @@ Route::get('/', function () {
 // Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
 //     return Inertia\Inertia::render('Dashboard');
 // })->name('dashboard');
-Route::group(['auth:sanctum', 'verified'], function () {
+Route::group(['auth:sanctum', 'verified',], function () {
     Route::get('/dashboard', function () {
         return Inertia\Inertia::render('Dashboard');
     })
@@ -30,9 +31,17 @@ Route::group(['auth:sanctum', 'verified'], function () {
     Route::get('/courses', 'App\Http\Controllers\CourseController@index')
         ->name('courses.index');
 
-    Route::get('/course/{id}', 'App\Http\Controllers\CourseController@show')
+    Route::post('/courses', 'App\Http\Controllers\CourseController@store')
+        ->name('courses.store');
+
+    Route::get('/courses/{id}', 'App\Http\Controllers\CourseController@show')
         ->name('courses.show ');
 
     Route::post('/toggleProgress', 'App\Http\Controllers\CourseController@toggle')
         ->name('courses.toggle');
+
+    Route::get('/courses/edit/{id} ', 'App\Http\Controllers\CourseController@edit')
+        ->name('courses.edit');
+    Route::patch('/courses/{id} ', 'App\Http\Controllers\CourseController@update')
+        ->name('courses.update');
 });
