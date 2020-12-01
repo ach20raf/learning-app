@@ -6,8 +6,10 @@ use Inertia\Inertia;
 use App\Models\Course;
 use App\Models\Episode;
 use Illuminate\Http\Request;
+use App\Youtube\YoutubeServices;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Redirect;
 
 class CourseController extends Controller
@@ -23,7 +25,12 @@ class CourseController extends Controller
                 episodes ON episodes.id=completions.episode_id
                 WHERE episodes.course_id=courses.id
             ) AS participants'))
-            ->withCount('episodes')->latest()->get()]);
+            ->addSelect(DB::raw(
+                '
+                (SELECT sum(duration) from episodes where episodes.course_id=courses.id)
+                 as total_duration'
+            ))
+            ->withCount('episodes')->latest()->paginate(5)]);
     }
     public function show(int $id)
     {
@@ -32,9 +39,7 @@ class CourseController extends Controller
             'watched' => auth()->user()->episodes
         ]);
     }
-
-
-    public function store(Request $request)
+    public function store(Request $request, YoutubeServices  $ytb)
     {
         $request->validate([
             'title' => 'required',
@@ -47,7 +52,10 @@ class CourseController extends Controller
         $course = Course::create($request->all());
         foreach ($request->input('episodes') as $ep) {
             $ep['course_id'] = $course->id;
-            Episode::create($ep);
+            $epi = Episode::create($ep);
+            $epi->duration
+                = $ytb->handleYoutubeVideoDuration($ep['video_url']);
+            $epi->save();
         }
         return Redirect::route('dashboard')->with('success', 'Félicitations , la formation a été mise en ligne.');
     }
@@ -66,17 +74,27 @@ class CourseController extends Controller
         $this->authorize('update', $course);
         return Inertia::render('Courses/Edit', ['course' => $course]);
     }
-    public function update(Request $request)
+    public function update(Request $request, YoutubeServices $ytb)
     {
-
+        // $request->validate([
+        //     'title' => 'required',
+        //     'description' => 'required',
+        //     'episodes' => ['required', 'array'],
+        //     'episodes.*.title' => 'required',
+        //     'episodes.*.description' => 'required',
+        //     'episodes.*.video_url' => 'required'
+        // ]);
         $course = Course::where('id', $request->id)->with('episodes')->first();
         $this->authorize('update', $course);
         $course->update($request->all());
         $course->episodes()->delete();
         foreach ($request->episodes as $ep) {
             $ep['course_id'] = $course->id;
-            Episode::create($ep);
+            $epi = Episode::create($ep);
+            $epi->duration
+                = $ytb->handleYoutubeVideoDuration($ep['video_url']);
+            $epi->save();
         }
-        return Redirect::route('dashboard')->with('success', 'Félicitations , la formation a été mise à jour.');
+        return Redirect::route('courses.show', $course->id)->with('success', 'Félicitations , la formation a été mise à jour.');
     }
 }

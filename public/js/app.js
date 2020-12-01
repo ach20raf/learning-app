@@ -3339,6 +3339,10 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -3347,6 +3351,14 @@ __webpack_require__.r(__webpack_exports__);
   },
   props: ["course"],
   mounted: function mounted() {//console.log(this.course.title, this.course.id, this.course.participants);
+  },
+  methods: {
+    convertTimestamp: function convertTimestamp(timestamp) {
+      var hours = Math.floor(timestamp / 3600);
+      var minutes = Math.floor(timestamp / 60 - hours * 60);
+      var seconds = Math.floor(timestamp - (hours * 3600 + minutes * 60));
+      return "\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t".concat(hours.toString().padStart(2, 0), " : \n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t").concat(minutes.toString().padStart(2, 0), ":\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t").concat(seconds.toString().padStart(2, 0));
+    }
   }
 });
 
@@ -3611,6 +3623,21 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -3618,17 +3645,23 @@ __webpack_require__.r(__webpack_exports__);
     AppLayout: _Layouts_AppLayout_vue__WEBPACK_IMPORTED_MODULE_0__["default"],
     Course: _Courses_Course_vue__WEBPACK_IMPORTED_MODULE_1__["default"]
   },
-  props: ['courses'],
+  props: ["courses"],
   mounted: function mounted() {// console.log(this.courseList);
   },
   data: function data() {
     return {
-      courseList: this.courses
+      courseList: this.courses.data,
+      spades: "&raquo;"
     };
   },
   methods: {
     formatDate: function formatDate(date) {
       return new Date(date).toLocaleDateString() + "    " + new Date(date).toLocaleTimeString();
+    },
+    formatLink: function formatLink(link) {
+      console.log(link);
+      return "done";
+      return link.replace("&laquo; ", "").replace(" &raquo;", "");
     }
   }
 });
@@ -3805,6 +3838,21 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -3815,7 +3863,9 @@ __webpack_require__.r(__webpack_exports__);
     ProgressBar: _ProgressBar_vue__WEBPACK_IMPORTED_MODULE_2__["default"]
   },
   props: ["course", "watched"],
-  mounted: function mounted() {},
+  mounted: function mounted() {
+    console.log(this.course);
+  },
   methods: {
     switchEp: function switchEp(id) {
       window.scrollTo({
@@ -47917,7 +47967,14 @@ var render = function() {
         _vm._v(_vm._s(_vm.courseItem.title))
       ]),
       _vm._v(" "),
-      _c("div", { staticClass: "text-sm text-gray-400" }, [
+      _c("div", { staticClass: "text-sm text-gray-400 mt-2" }, [
+        _c("span", { staticClass: "block text-gray-500 font-serif" }, [
+          _vm._v(
+            "\n\t\t\t\t" +
+              _vm._s(_vm.convertTimestamp(_vm.courseItem.total_duration)) +
+              "\n\t\t\t"
+          )
+        ]),
         _vm._v(
           "\n\t\t\t" + _vm._s(_vm.courseItem.episodes_count) + " episodes\n\t\t"
         )
@@ -48510,7 +48567,7 @@ var render = function() {
         {
           key: "header",
           fn: function() {
-            return [_vm._v("\n        Liste des formations\n    ")]
+            return [_vm._v(" Liste des formations ")]
           },
           proxy: true
         }
@@ -48519,15 +48576,34 @@ var render = function() {
     [
       _vm._v(" "),
       _c(
-        "div",
-        _vm._l(_vm.courseList, function(course) {
-          return _c("course", {
-            key: course.id,
-            staticClass: "my-3",
-            attrs: { course: course }
+        "section",
+        [
+          _vm._l(_vm.courseList, function(course) {
+            return _c("course", {
+              key: course.id,
+              staticClass: "my-3",
+              attrs: { course: course }
+            })
+          }),
+          _vm._v(" "),
+          _vm._l(this.courses.links, function(link) {
+            return _c(
+              "inertia-link",
+              {
+                key: link.label,
+                staticClass: "text-indigo-700 m-5 pb-6 border-gray",
+                attrs: { href: link.url }
+              },
+              [
+                _c("span", {
+                  class: { "text-red-700": link.active },
+                  domProps: { innerHTML: _vm._s(link.label) }
+                })
+              ]
+            )
           })
-        }),
-        1
+        ],
+        2
       )
     ]
   )
@@ -48640,81 +48716,125 @@ var render = function() {
     },
     [
       _vm._v(" "),
-      _c("div", { staticClass: "py-4 mx-8" }, [
-        _c("div", { staticClass: "text-2xl mb-6" }, [
-          _vm._v(_vm._s(_vm.episode.title))
-        ]),
-        _vm._v(" "),
-        _c("iframe", {
-          staticClass: "w-full h-screen",
-          attrs: {
-            src: _vm.episode.video_url,
-            frameborder: "0",
-            allow:
-              "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture",
-            allowfullscreen: ""
-          }
-        }),
-        _vm._v(" "),
-        _c(
-          "div",
-          { staticClass: "py-6" },
-          [
-            _c("progress-bar", {
+      _vm.courseShow.episodes.length > 0
+        ? _c("div", { staticClass: "py-4 mx-8" }, [
+            _c("div", { staticClass: "text-2xl mb-6" }, [
+              _vm._v(_vm._s(_vm.episode.title))
+            ]),
+            _vm._v(" "),
+            _c("iframe", {
+              staticClass: "w-full h-screen",
               attrs: {
-                watchedEpisodes: _vm.watched,
-                episodes: _vm.courseShow.episodes
+                src: _vm.episode.video_url,
+                frameborder: "0",
+                allow:
+                  "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture",
+                allowfullscreen: ""
               }
-            })
-          ],
-          1
-        ),
-        _vm._v(" "),
-        _c("div", { staticClass: "mt-6" }, [
-          _c(
-            "ul",
-            _vm._l(_vm.courseShow.episodes, function(ep, index) {
-              return _c(
-                "li",
-                {
-                  key: ep.id,
-                  staticClass: "mt-3 flex justify-between items-center"
-                },
-                [
-                  _c("div", [
-                    _vm._v(
-                      "\n\t\t\t\t\t\tEpisode nº" +
-                        _vm._s(index + 1) +
-                        " - " +
-                        _vm._s(ep.title) +
-                        " -\n\t\t\t\t\t\t"
-                    ),
-                    _c(
-                      "button",
-                      {
-                        staticClass:
-                          "text-gray-500 focus:text-indigo-500 hover:text-blue-600 focus:outline-none",
-                        on: {
-                          click: function($event) {
-                            return _vm.switchEp(ep.id)
-                          }
-                        }
-                      },
-                      [_vm._v("\n\t\t\t\t\t\t\tVoir l'épisode\n\t\t\t\t\t\t")]
-                    )
-                  ]),
-                  _vm._v(" "),
-                  _c("progress-button", {
-                    attrs: { episode_id: ep.id, watchedEpisodes: _vm.watched }
-                  })
-                ],
-                1
-              )
             }),
-            0
-          )
-        ])
-      ])
+            _vm._v(" "),
+            _c(
+              "div",
+              { staticClass: "py-6" },
+              [
+                _c("progress-bar", {
+                  attrs: {
+                    watchedEpisodes: _vm.watched,
+                    episodes: _vm.courseShow.episodes
+                  }
+                })
+              ],
+              1
+            ),
+            _vm._v(" "),
+            _c("div", { staticClass: "mt-6" }, [
+              _c(
+                "ul",
+                _vm._l(_vm.courseShow.episodes, function(ep, index) {
+                  return _c(
+                    "li",
+                    {
+                      key: ep.id,
+                      staticClass: "mt-3 flex justify-between items-center"
+                    },
+                    [
+                      _c("div", [
+                        _vm._v(
+                          "\n\t\t\t\t\t\tEpisode nº" +
+                            _vm._s(index + 1) +
+                            " - " +
+                            _vm._s(ep.title) +
+                            " -\n\t\t\t\t\t\t"
+                        ),
+                        _c(
+                          "button",
+                          {
+                            staticClass:
+                              "text-gray-500 focus:text-indigo-500 hover:text-blue-600 focus:outline-none",
+                            on: {
+                              click: function($event) {
+                                return _vm.switchEp(ep.id)
+                              }
+                            }
+                          },
+                          [
+                            _vm._v(
+                              "\n\t\t\t\t\t\t\tVoir l'épisode\n\t\t\t\t\t\t"
+                            )
+                          ]
+                        )
+                      ]),
+                      _vm._v(" "),
+                      _c("progress-button", {
+                        attrs: {
+                          episode_id: ep.id,
+                          watchedEpisodes: _vm.watched
+                        }
+                      })
+                    ],
+                    1
+                  )
+                }),
+                0
+              )
+            ])
+          ])
+        : _c("div", [
+            _c(
+              "div",
+              { staticClass: "flex flex-col justify-center bg-grey-lighter" },
+              [
+                _c(
+                  "div",
+                  {
+                    staticClass:
+                      "text-2xl text-gray-400 text-center bg-grey-light py-2 m-2"
+                  },
+                  [
+                    _vm._v(
+                      "\n\t\t\t\tDescription : " +
+                        _vm._s(_vm.courseShow.description) +
+                        "\n\t\t\t"
+                    )
+                  ]
+                ),
+                _vm._v(" "),
+                _c("div", {
+                  staticClass:
+                    "text-grey-darker text-center bg-grey-light px-4 py-2 m-2"
+                }),
+                _vm._v(" "),
+                _c(
+                  "div",
+                  {
+                    staticClass:
+                      "text-6xl font-serif text-bold text-grey-darker text-center bg-grey-light px-4 py-2 m-2"
+                  },
+                  [_vm._v("\n\t\t\t\tNo episode found\n\t\t\t")]
+                )
+              ]
+            )
+          ])
     ]
   )
 }

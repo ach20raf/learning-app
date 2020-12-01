@@ -35,7 +35,7 @@ Route::group(['auth:sanctum', 'verified',], function () {
         ->name('courses.store');
 
     Route::get('/courses/{id}', 'App\Http\Controllers\CourseController@show')
-        ->name('courses.show ');
+        ->name('courses.show');
 
     Route::post('/toggleProgress', 'App\Http\Controllers\CourseController@toggle')
         ->name('courses.toggle');

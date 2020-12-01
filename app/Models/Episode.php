@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Episode extends Model
 {
     use HasFactory;
-    protected $fillable = ['title', 'description', 'video_url', 'course_id',];
+    protected $fillable = ['title', 'description', 'video_url', 'course_id', 'duration '];
 
     public function course()
     {
