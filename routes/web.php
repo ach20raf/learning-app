@@ -45,3 +45,5 @@ Route::group(['auth:sanctum', 'verified',], function () {
     Route::patch('/courses/{id} ', 'App\Http\Controllers\CourseController@update')
         ->name('courses.update');
 });
+
+Route::get('/pusher', 'App\Http\Controllers\CourseController@new');

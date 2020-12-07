@@ -10,8 +10,8 @@
 			></course>
 			<inertia-link
 				:href="link.url"
-				v-for="link in this.courses.links"
-				v-bind:key="link.label"
+				v-for="(link, index) in this.courses.links"
+				v-bind:key="index"
 				class="text-indigo-700 m-5 pb-6 border-gray"
 			>
 				<span
@@ -48,7 +48,6 @@
 			},
 			formatLink(link) {
 				console.log(link);
-				return "done";
 				return link.replace("&laquo; ", "").replace(" &raquo;", "");
 			},
 		},

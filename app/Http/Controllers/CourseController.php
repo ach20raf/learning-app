@@ -6,10 +6,10 @@ use Inertia\Inertia;
 use App\Models\Course;
 use App\Models\Episode;
 use Illuminate\Http\Request;
+use App\Events\NewCourseEvent;
 use App\Youtube\YoutubeServices;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Redirect;
 
 class CourseController extends Controller
@@ -57,6 +57,14 @@ class CourseController extends Controller
                 = $ytb->handleYoutubeVideoDuration($ep['video_url']);
             $epi->save();
         }
+        $name = Auth::user()->name;
+        $data = [
+            'message' => "$name just added $course->title.",
+            'course' => [
+                'id' => $course->id,
+            ]
+        ];
+        event(new NewCourseEvent($data));
         return Redirect::route('dashboard')->with('success', 'Félicitations , la formation a été mise en ligne.');
     }
 
@@ -96,5 +104,19 @@ class CourseController extends Controller
             $epi->save();
         }
         return Redirect::route('courses.show', $course->id)->with('success', 'Félicitations , la formation a été mise à jour.');
+    }
+
+    public function new()
+    {
+        $name = Auth::user()->name;
+        $data = [
+            'message' => "$name just added a new course.",
+            'course' => [
+                'id' => 1,
+                'title' => "Title test"
+            ]
+        ];
+        event(new NewCourseEvent($data));
+        return $data;
     }
 }
